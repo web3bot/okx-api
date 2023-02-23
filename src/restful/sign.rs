@@ -53,14 +53,28 @@ impl OkxClient {
             .headers(headers)
             .send()
             .await?
-            .json::<T>()
+            .text()
             .await?;
 
         if self.debug {
             println!("[*] Response {:#?}", res);
         }
 
-        Ok(res)
+        Ok(serde_json::from_str::<T>(&res)?)
+
+        // let res = client
+        //     .get(format!("{}{}", self.domain, get_url_params))
+        //     .headers(headers)
+        //     .send()
+        //     .await?
+        //     .json::<T>()
+        //     .await?;
+
+        // if self.debug {
+        //     println!("[*] Response {:#?}", res);
+        // }
+
+        // Ok(res)
     }
 
     pub async fn post<T>(
@@ -96,20 +110,35 @@ impl OkxClient {
             );
         }
 
+        // let res = client
+        //     .post(format!("{}{}", self.domain, request_path))
+        //     .headers(headers)
+        //     .json(&parameters)
+        //     .send()
+        //     .await?
+        //     .json::<T>()
+        //     .await?;
+
+        // if self.debug {
+        //     println!("[*]Response {:#?}", res);
+        // }
+
+        // Ok(res)
+
         let res = client
             .post(format!("{}{}", self.domain, request_path))
             .headers(headers)
             .json(&parameters)
             .send()
             .await?
-            .json::<T>()
+            .text()
             .await?;
 
         if self.debug {
-            println!("[*]Response {:#?}", res);
+            println!("[*] Response {:#?}", res);
         }
 
-        Ok(res)
+        Ok(serde_json::from_str::<T>(&res)?)
     }
 
     pub async fn post_vec<T>(
@@ -147,14 +176,18 @@ impl OkxClient {
             .json(&parameters)
             .send()
             .await?
-            .json::<T>()
+            .text()
             .await?;
+
+        // if self.debug {
+        //     println!("[*] Response {:#?}", res);
+        // }
 
         if self.debug {
             println!("[*] Response {:#?}", res);
         }
 
-        Ok(res)
+        Ok(serde_json::from_str::<T>(&res)?)
     }
 
     fn create_header(&self, sign: &str, timestamp: &str) -> HeaderMap {
